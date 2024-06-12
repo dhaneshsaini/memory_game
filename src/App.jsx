@@ -17,10 +17,12 @@ export default function App() {
   const [flippedCards, setFlippedCards] = useState([])
   const [matchedCount, setMatchedCount] = useState(0)
   const [move, setMove] = useState(0)
+  const [isWon, setIsWon] = useState(false)
 
   useEffect(() => {
     if (flippedCards.length === 2) {
-      const [firstIndex, secondIndex] = flippedCards;
+      const [firstIndex, secondIndex] = flippedCards
+      setMove(move + 1)
       if (icons[firstIndex].icon === icons[secondIndex].icon) {
         setTimeout(() => {
           setIcons(prevIcons =>
@@ -29,7 +31,7 @@ export default function App() {
                 ? { ...icon, isMatched: true }
                 : icon
             )
-          );
+          )
           setMatchedCount(matchedCount + 1)
           setFlippedCards([])
         }, 1000)
@@ -48,6 +50,12 @@ export default function App() {
     }
   }, [flippedCards, icons, matchedCount])
 
+  useEffect(() => {
+    if (matchedCount === icons.length / 2) {
+      setIsWon(true)
+    }
+  }, [matchedCount, icons.length])
+
   function handleCardClick(index) {
     if (flippedCards.length < 2 && !icons[index].isFlipped && !icons[index].isMatched) {
       setIcons(prevIcons =>
@@ -56,12 +64,11 @@ export default function App() {
         )
       )
       setFlippedCards([...flippedCards, index])
-      setMove(move + .5)
     }
   }
 
   return (
-    <section className="max-w-2xl mx-auto bg-stone-100 min-h-screen">
+    <section className="max-w-2xl relative mx-auto bg-stone-100 min-h-screen">
       <div className="text-center py-10">
         <h1 className="font-semibold text-2xl">Memory Game</h1>
       </div>
@@ -80,6 +87,16 @@ export default function App() {
           ))}
         </div>
       </div>
+
+      {isWon ?
+        <div className="z-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white p-10 rounded-lg border drop-shadow-md text-center">
+          <h2 className="text-4xl font-medium">Congratulations</h2>
+          <span className="text-7xl">🐵</span>
+          <p className="leading-relaxed mt-3 font-semibold">You've won the game!</p>
+          <div className="cursor-pointer my-5">
+            <span onClick={() => location.reload()} className="font-semibold">&#8634; Restart Game</span>
+          </div>
+        </div> : ''}
     </section>
-  );
+  )
 }
